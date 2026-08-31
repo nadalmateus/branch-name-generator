@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Azure DevOps → Branch Name</title>
+  <title>Azure DevOps → Branch &amp; Commit</title>
 
   <style>
     * {
@@ -147,6 +147,12 @@
       flex-wrap: wrap;
     }
 
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
     .counter {
       color: #6b7280;
       font-size: 14px;
@@ -154,10 +160,20 @@
     }
 
     .result {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .output {
       display: flex;
       align-items: center;
       gap: 10px;
-      margin-bottom: 10px;
+    }
+
+    .output + .preview-title {
+      margin-top: 14px;
     }
 
     .branch {
@@ -200,13 +216,17 @@
         flex-direction: column;
       }
 
-      .result {
+      .output {
         flex-direction: column;
         align-items: stretch;
       }
 
       button.copy {
         width: 100%;
+      }
+
+      .header-actions button {
+        flex: 1;
       }
     }
   </style>
@@ -321,12 +341,25 @@
         </div>
 
 
-        <button
-          id="copyAllButton"
-          class="success"
-          onclick="copyAll()"
+        <div
+          class="header-actions"
+          id="headerActions"
           style="display: none;"
-        ></button>
+        >
+
+          <button
+            id="copyAllBranchesButton"
+            class="success"
+            onclick="copyAll('branch')"
+          ></button>
+
+          <button
+            id="copyAllCommitsButton"
+            class="success"
+            onclick="copyAll('commit')"
+          ></button>
+
+        </div>
 
       </div>
 
@@ -356,33 +389,39 @@
     const translations = {
 
       en: {
-        title: "Azure DevOps → Branch Name",
+        title: "Azure DevOps → Branch & Commit",
         description:
-          "Paste Azure DevOps ticket titles and generate branch names automatically.",
+          "Paste Azure DevOps ticket titles and generate branch names and squash commit messages automatically.",
         language: "Language",
         tickets: "Tickets",
         hint:
-          "The branch name is generated automatically as you type.",
+          "Branch name and squash commit are generated automatically as you type.",
         bugPrefix:
           "Bug prefix:",
         generate:
-          "Generate branches",
+          "Generate",
         results:
-          "Generated branches",
-        copyAll:
-          "Copy all",
+          "Generated names",
+        copyAllBranches:
+          "Copy all branches",
+        copyAllCommits:
+          "Copy all commits",
         copied:
           "Copied!",
         copy:
           "Copy",
+        branchLabel:
+          "Branch",
+        commitLabel:
+          "Squash commit",
         empty:
           "Start typing a ticket above.",
         emptyError:
           "Enter at least one ticket.",
         countOne:
-          "branch",
+          "ticket",
         countMany:
-          "branches",
+          "tickets",
         pending:
           "Waiting for ticket format...",
         placeholder:
@@ -394,33 +433,39 @@ User Story 938: Improve checkout experience`
 
 
       pt: {
-        title: "Azure DevOps → Nome da Branch",
+        title: "Azure DevOps → Branch e Commit",
         description:
-          "Cole os títulos dos tickets do Azure DevOps e gere os nomes das branches automaticamente.",
+          "Cole os títulos dos tickets do Azure DevOps e gere os nomes das branches e as mensagens de squash commit automaticamente.",
         language: "Idioma",
         tickets: "Tickets",
         hint:
-          "O nome da branch é gerado automaticamente enquanto você digita.",
+          "O nome da branch e o squash commit são gerados automaticamente enquanto você digita.",
         bugPrefix:
           "Prefixo para Bug:",
         generate:
-          "Gerar branches",
+          "Gerar",
         results:
-          "Branches geradas",
-        copyAll:
-          "Copiar todos",
+          "Nomes gerados",
+        copyAllBranches:
+          "Copiar branches",
+        copyAllCommits:
+          "Copiar commits",
         copied:
           "Copiado!",
         copy:
           "Copiar",
+        branchLabel:
+          "Branch",
+        commitLabel:
+          "Squash commit",
         empty:
           "Comece a digitar um ticket acima.",
         emptyError:
           "Digite pelo menos um ticket.",
         countOne:
-          "branch",
+          "ticket",
         countMany:
-          "branches",
+          "tickets",
         pending:
           "Aguardando o formato do ticket...",
         placeholder:
@@ -432,33 +477,39 @@ História de Usuário 938: Melhorar experiência de checkout`
 
 
       es: {
-        title: "Azure DevOps → Nombre de Branch",
+        title: "Azure DevOps → Branch y Commit",
         description:
-          "Pegue los títulos de los tickets de Azure DevOps y genere automáticamente los nombres de las branches.",
+          "Pegue los títulos de los tickets de Azure DevOps y genere automáticamente los nombres de las branches y los mensajes de squash commit.",
         language: "Idioma",
         tickets: "Tickets",
         hint:
-          "El nombre de la branch se genera automáticamente mientras escribe.",
+          "El nombre de la branch y el squash commit se generan automáticamente mientras escribe.",
         bugPrefix:
           "Prefijo para Bug:",
         generate:
-          "Generar branches",
+          "Generar",
         results:
-          "Branches generadas",
-        copyAll:
-          "Copiar todas",
+          "Nombres generados",
+        copyAllBranches:
+          "Copiar branches",
+        copyAllCommits:
+          "Copiar commits",
         copied:
           "¡Copiado!",
         copy:
           "Copiar",
+        branchLabel:
+          "Branch",
+        commitLabel:
+          "Squash commit",
         empty:
           "Comience a escribir un ticket arriba.",
         emptyError:
           "Ingrese al menos un ticket.",
         countOne:
-          "branch",
+          "ticket",
         countMany:
-          "branches",
+          "tickets",
         pending:
           "Esperando el formato del ticket...",
         placeholder:
@@ -470,33 +521,39 @@ Historia de Usuario 938: Mejorar experiencia de checkout`
 
 
       de: {
-        title: "Azure DevOps → Branch-Name",
+        title: "Azure DevOps → Branch & Commit",
         description:
-          "Fügen Sie Azure-DevOps-Ticket-Titel ein und erstellen Sie automatisch Branch-Namen.",
+          "Fügen Sie Azure-DevOps-Ticket-Titel ein und erstellen Sie automatisch Branch-Namen und Squash-Commit-Nachrichten.",
         language: "Sprache",
         tickets: "Tickets",
         hint:
-          "Der Branch-Name wird automatisch während der Eingabe generiert.",
+          "Branch-Name und Squash-Commit werden automatisch während der Eingabe generiert.",
         bugPrefix:
           "Bug-Präfix:",
         generate:
-          "Branches generieren",
+          "Generieren",
         results:
-          "Generierte Branches",
-        copyAll:
-          "Alle kopieren",
+          "Generierte Namen",
+        copyAllBranches:
+          "Alle Branches kopieren",
+        copyAllCommits:
+          "Alle Commits kopieren",
         copied:
           "Kopiert!",
         copy:
           "Kopieren",
+        branchLabel:
+          "Branch",
+        commitLabel:
+          "Squash-Commit",
         empty:
           "Beginnen Sie oben mit der Eingabe eines Tickets.",
         emptyError:
           "Geben Sie mindestens ein Ticket ein.",
         countOne:
-          "Branch",
+          "Ticket",
         countMany:
-          "Branches",
+          "Tickets",
         pending:
           "Warte auf das Ticket-Format...",
         placeholder:
@@ -517,6 +574,13 @@ Benutzergeschichte 938: Checkout-Erfahrung verbessern`
 
     const ticketTypes = {
 
+      userStory: [
+        "user story",
+        "história de usuário",
+        "historia de usuario",
+        "benutzergeschichte"
+      ],
+
       feature: [
         "feature",
         "funcionalidade",
@@ -534,13 +598,6 @@ Benutzergeschichte 938: Checkout-Erfahrung verbessern`
         "tarefa",
         "tarea",
         "aufgabe"
-      ],
-
-      userStory: [
-        "user story",
-        "história de usuário",
-        "historia de usuario",
-        "benutzergeschichte"
       ]
 
     };
@@ -555,6 +612,8 @@ Benutzergeschichte 938: Checkout-Erfahrung verbessern`
     let currentLanguage = "en";
 
     let generatedBranches = [];
+
+    let generatedCommits = [];
 
 
     /*
@@ -598,9 +657,6 @@ Benutzergeschichte 938: Checkout-Erfahrung verbessern`
      * ==========================================
      * REAL-TIME GENERATION
      * ==========================================
-     *
-     * A branch é atualizada a cada alteração
-     * no textarea.
      */
 
     ticketsInput.addEventListener(
@@ -678,9 +734,15 @@ Benutzergeschichte 938: Checkout-Erfahrung verbessern`
 
 
       document.getElementById(
-        "copyAllButton"
+        "copyAllBranchesButton"
       ).textContent =
-        t.copyAll;
+        t.copyAllBranches;
+
+
+      document.getElementById(
+        "copyAllCommitsButton"
+      ).textContent =
+        t.copyAllCommits;
 
 
       document.getElementById(
@@ -693,7 +755,7 @@ Benutzergeschichte 938: Checkout-Erfahrung verbessern`
 
     /*
      * ==========================================
-     * GENERATE BRANCHES
+     * GENERATE
      * ==========================================
      */
 
@@ -717,9 +779,9 @@ Benutzergeschichte 938: Checkout-Erfahrung verbessern`
           "counter"
         );
 
-      const copyAllButton =
+      const headerActions =
         document.getElementById(
-          "copyAllButton"
+          "headerActions"
         );
 
       const t =
@@ -732,19 +794,14 @@ Benutzergeschichte 938: Checkout-Erfahrung verbessern`
 
       generatedBranches = [];
 
+      generatedCommits = [];
 
-      const tickets =
-        input
-          .split("\n")
-          .map(line => line.trim());
-
-
-      /*
-       * Remove linhas completamente vazias.
-       */
 
       const validTickets =
-        tickets.filter(Boolean);
+        input
+          .split("\n")
+          .map(line => line.trim())
+          .filter(Boolean);
 
 
       if (validTickets.length === 0) {
@@ -757,7 +814,7 @@ Benutzergeschichte 938: Checkout-Erfahrung verbessern`
 
         counter.textContent = "";
 
-        copyAllButton.style.display =
+        headerActions.style.display =
           "none";
 
         return;
@@ -766,15 +823,18 @@ Benutzergeschichte 938: Checkout-Erfahrung verbessern`
 
 
       /*
-       * Gera as branches.
+       * Gera branch + commit para cada ticket.
        */
 
+      const parsed =
+        validTickets.map(parseTicket);
+
+
       generatedBranches =
-        validTickets.map(ticket => {
+        parsed.map(buildBranch);
 
-          return ticketToBranch(ticket);
-
-        });
+      generatedCommits =
+        parsed.map(buildCommit);
 
 
       /*
@@ -782,15 +842,15 @@ Benutzergeschichte 938: Checkout-Erfahrung verbessern`
        */
 
       counter.textContent =
-        `(${generatedBranches.length} ${
-          generatedBranches.length === 1
+        `(${validTickets.length} ${
+          validTickets.length === 1
             ? t.countOne
             : t.countMany
         })`;
 
 
-      copyAllButton.style.display =
-        "block";
+      headerActions.style.display =
+        "flex";
 
 
       /*
@@ -800,8 +860,8 @@ Benutzergeschichte 938: Checkout-Erfahrung verbessern`
       validTickets.forEach(
         (ticket, index) => {
 
-          const branch =
-            generatedBranches[index];
+          const pending =
+            !isCompleteTicket(ticket);
 
 
           const result =
@@ -813,77 +873,21 @@ Benutzergeschichte 938: Checkout-Erfahrung verbessern`
             "result";
 
 
-          const branchElement =
-            document.createElement(
-              "div"
-            );
-
-          branchElement.className =
-            "branch";
-
-
-          /*
-           * Se o ticket ainda não está
-           * completo, mostra um preview.
-           */
-
-          if (!isCompleteTicket(ticket)) {
-
-            branchElement.classList.add(
-              "pending"
-            );
-
-          }
-
-
-          branchElement.textContent =
-            branch;
-
-
-          const copyButton =
-            document.createElement(
-              "button"
-            );
-
-          copyButton.className =
-            "copy";
-
-          copyButton.textContent =
-            t.copy;
-
-
-          copyButton.onclick =
-            async () => {
-
-              await copyText(
-                branch
-              );
-
-
-              copyButton.textContent =
-                translations[
-                  currentLanguage
-                ].copied;
-
-
-              setTimeout(() => {
-
-                copyButton.textContent =
-                  translations[
-                    currentLanguage
-                  ].copy;
-
-              }, 1500);
-
-            };
-
-
           result.appendChild(
-            branchElement
+            buildOutputRow(
+              t.branchLabel,
+              generatedBranches[index],
+              pending
+            )
           );
 
+
           result.appendChild(
-            copyButton
+            buildOutputRow(
+              t.commitLabel,
+              generatedCommits[index],
+              pending
+            )
           );
 
 
@@ -899,11 +903,119 @@ Benutzergeschichte 938: Checkout-Erfahrung verbessern`
 
     /*
      * ==========================================
-     * TICKET → BRANCH
+     * OUTPUT ROW
      * ==========================================
      */
 
-    function ticketToBranch(ticket) {
+    function buildOutputRow(
+      label,
+      value,
+      pending
+    ) {
+
+      const fragment =
+        document.createDocumentFragment();
+
+
+      const title =
+        document.createElement("div");
+
+      title.className =
+        "preview-title";
+
+      title.textContent =
+        label;
+
+
+      const row =
+        document.createElement("div");
+
+      row.className =
+        "output";
+
+
+      const valueElement =
+        document.createElement("div");
+
+      valueElement.className =
+        "branch";
+
+      if (pending) {
+
+        valueElement.classList.add(
+          "pending"
+        );
+
+      }
+
+      valueElement.textContent =
+        value;
+
+
+      const copyButton =
+        document.createElement(
+          "button"
+        );
+
+      copyButton.className =
+        "copy";
+
+      copyButton.textContent =
+        translations[
+          currentLanguage
+        ].copy;
+
+
+      copyButton.onclick =
+        async () => {
+
+          await copyText(value);
+
+
+          copyButton.textContent =
+            translations[
+              currentLanguage
+            ].copied;
+
+
+          setTimeout(() => {
+
+            copyButton.textContent =
+              translations[
+                currentLanguage
+              ].copy;
+
+          }, 1500);
+
+        };
+
+
+      row.appendChild(valueElement);
+
+      row.appendChild(copyButton);
+
+
+      fragment.appendChild(title);
+
+      fragment.appendChild(row);
+
+
+      return fragment;
+
+    }
+
+
+    /*
+     * ==========================================
+     * PARSE TICKET
+     * ==========================================
+     *
+     * Retorna { type, id, description }, mesmo
+     * quando o ticket ainda está incompleto,
+     * para que o preview continue funcionando.
+     */
+
+    function parseTicket(ticket) {
 
       const match =
         ticket.match(
@@ -911,99 +1023,32 @@ Benutzergeschichte 938: Checkout-Erfahrung verbessern`
         );
 
 
-      /*
-       * Enquanto o usuário está digitando
-       * o ID, ainda podemos gerar um preview.
-       */
+      if (match) {
 
-      if (!match) {
+        return {
 
-        return previewBranch(ticket);
+          type: normalizeTicketType(
+            match[1].trim().toLowerCase()
+          ),
+
+          id: match[2],
+
+          description: match[3].trim()
+
+        };
 
       }
 
 
-      const rawType =
-        match[1]
-          .trim()
-          .toLowerCase();
-
-
-      const id =
-        match[2];
-
-
-      const description =
-        match[3];
-
+      /*
+       * Preview: tenta descobrir o tipo pelo
+       * início da linha e o ID pelo primeiro
+       * número encontrado.
+       */
 
       const type =
-        normalizeTicketType(
-          rawType
-        );
+        guessTicketType(ticket);
 
-
-      const branchType =
-        getBranchType(type);
-
-
-      /*
-       * Se ainda não existe descrição,
-       * mostra apenas o prefixo + ID.
-       */
-
-      if (!description.trim()) {
-
-        return `${branchType}/${id}`;
-
-      }
-
-
-      return (
-        `${branchType}/` +
-        `${id}-` +
-        `${slugify(description)}`
-      );
-
-    }
-
-
-    /*
-     * ==========================================
-     * PREVIEW
-     * ==========================================
-     *
-     * Permite mostrar alguma coisa enquanto
-     * o usuário ainda está digitando.
-     */
-
-    function previewBranch(ticket) {
-
-      const normalized =
-        ticket.toLowerCase();
-
-
-      let branchType =
-        "feature";
-
-
-      if (
-        normalized.startsWith("bug") ||
-        normalized.startsWith("error") ||
-        normalized.startsWith("fehler")
-      ) {
-
-        branchType =
-          document.getElementById(
-            "bugPrefix"
-          ).value;
-
-      }
-
-
-      /*
-       * Tenta encontrar o ID.
-       */
 
       const idMatch =
         ticket.match(/\b(\d+)\b/);
@@ -1015,54 +1060,153 @@ Benutzergeschichte 938: Checkout-Erfahrung verbessern`
           idMatch[1];
 
 
-        const afterId =
+        const description =
           ticket
             .substring(
-              idMatch.index +
-              id.length
+              idMatch.index + id.length
             )
-            .replace(
-              /^\s*:\s*/,
-              ""
-            )
+            .replace(/^\s*:\s*/, "")
             .trim();
 
 
-        if (afterId) {
-
-          return (
-            `${branchType}/` +
-            `${id}-` +
-            `${slugify(afterId)}`
-          );
-
-        }
-
-
-        return (
-          `${branchType}/${id}`
-        );
+        return { type, id, description };
 
       }
 
 
-      /*
-       * Ainda não encontrou ID.
-       */
+      return {
 
-      if (!ticket.trim()) {
+        type,
 
-        return translations[
-          currentLanguage
-        ].empty;
+        id: null,
+
+        description: ticket.trim()
+
+      };
+
+    }
+
+
+    /*
+     * ==========================================
+     * BUILD BRANCH
+     * ==========================================
+     */
+
+    function buildBranch(ticket) {
+
+      const prefix =
+        getBranchType(ticket.type);
+
+
+      const slug =
+        slugify(ticket.description);
+
+
+      if (!ticket.id) {
+
+        return slug
+          ? `${prefix}/${slug}`
+          : `${prefix}/`;
+
+      }
+
+
+      if (!slug) {
+
+        return `${prefix}/${ticket.id}`;
 
       }
 
 
       return (
-        `${branchType}/` +
-        slugify(ticket)
+        `${prefix}/` +
+        `${ticket.id}-` +
+        `${slug}`
       );
+
+    }
+
+
+    /*
+     * ==========================================
+     * BUILD COMMIT
+     * ==========================================
+     *
+     * feat: prevent negative value [AB#941]
+     */
+
+    function buildCommit(ticket) {
+
+      const commitType =
+        getCommitType(ticket.type);
+
+
+      const subject =
+        toCommitSubject(
+          ticket.description
+        );
+
+
+      const reference =
+        ticket.id
+          ? ` [AB#${ticket.id}]`
+          : "";
+
+
+      if (!subject) {
+
+        return `${commitType}:${reference}`;
+
+      }
+
+
+      return (
+        `${commitType}: ` +
+        `${subject}` +
+        `${reference}`
+      );
+
+    }
+
+
+    /*
+     * ==========================================
+     * COMMIT SUBJECT
+     * ==========================================
+     *
+     * Deixa o texto em minúsculas, mas preserva
+     * siglas (API, CSV, SQL) e remove o ponto
+     * final.
+     */
+
+    function toCommitSubject(text) {
+
+      return text
+
+        .trim()
+
+        .replace(/\s+/g, " ")
+
+        .replace(/[.\s]+$/, "")
+
+        .split(" ")
+
+        .map(word => {
+
+          const isAcronym =
+            word.length > 1 &&
+            word === word.toUpperCase() &&
+            /[a-zà-ÿ]/i.test(word);
+
+
+          return isAcronym
+            ? word
+            : word.toLowerCase();
+
+        })
+
+        .join(" ");
 
     }
 
@@ -1098,9 +1242,49 @@ Benutzergeschichte 938: Checkout-Erfahrung verbessern`
         )
       ) {
 
-        if (
-          aliases.includes(type)
-        ) {
+        if (aliases.includes(type)) {
+
+          return normalizedType;
+
+        }
+
+      }
+
+
+      return "feature";
+
+    }
+
+
+    /*
+     * ==========================================
+     * GUESS TYPE (PREVIEW)
+     * ==========================================
+     */
+
+    function guessTicketType(ticket) {
+
+      const normalized =
+        ticket.trim().toLowerCase();
+
+
+      for (
+        const [
+          normalizedType,
+          aliases
+        ] of Object.entries(
+          ticketTypes
+        )
+      ) {
+
+        const found =
+          aliases.some(
+            alias =>
+              normalized.startsWith(alias)
+          );
+
+
+        if (found) {
 
           return normalizedType;
 
@@ -1124,11 +1308,6 @@ Benutzergeschichte 938: Checkout-Erfahrung verbessern`
 
       switch (type) {
 
-        case "feature":
-
-          return "feature";
-
-
         case "bug":
 
           return document
@@ -1143,14 +1322,46 @@ Benutzergeschichte 938: Checkout-Erfahrung verbessern`
           return "chore";
 
 
+        case "feature":
+
         case "userStory":
-
-          return "feature";
-
 
         default:
 
           return "feature";
+
+      }
+
+    }
+
+
+    /*
+     * ==========================================
+     * COMMIT TYPE
+     * ==========================================
+     */
+
+    function getCommitType(type) {
+
+      switch (type) {
+
+        case "bug":
+
+          return "fix";
+
+
+        case "task":
+
+          return "chore";
+
+
+        case "feature":
+
+        case "userStory":
+
+        default:
+
+          return "feat";
 
       }
 
@@ -1239,38 +1450,44 @@ Benutzergeschichte 938: Checkout-Erfahrung verbessern`
      * ==========================================
      */
 
-    async function copyAll() {
+    async function copyAll(kind) {
 
-      if (
-        generatedBranches.length === 0
-      ) {
+      const list =
+        kind === "commit"
+          ? generatedCommits
+          : generatedBranches;
+
+
+      if (list.length === 0) {
 
         return;
 
       }
 
 
-      const text =
-        generatedBranches.join("\n");
-
-
-      await copyText(text);
+      await copyText(
+        list.join("\n")
+      );
 
 
       const button =
         document.getElementById(
-          "copyAllButton"
+          kind === "commit"
+            ? "copyAllCommitsButton"
+            : "copyAllBranchesButton"
         );
 
 
-      const t =
-        translations[
-          currentLanguage
-        ];
+      const originalKey =
+        kind === "commit"
+          ? "copyAllCommits"
+          : "copyAllBranches";
 
 
       button.textContent =
-        t.copied;
+        translations[
+          currentLanguage
+        ].copied;
 
 
       setTimeout(() => {
@@ -1278,7 +1495,7 @@ Benutzergeschichte 938: Checkout-Erfahrung verbessern`
         button.textContent =
           translations[
             currentLanguage
-          ].copyAll;
+          ][originalKey];
 
       }, 1500);
 
