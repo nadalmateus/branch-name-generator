@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Azure DevOps → Branch Name</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+    }
+
+    .description {
+      color: #6b7280;
+      margin: 0;
+    }
+
+    .language {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .language select,
+    .options select {
+      padding: 8px 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      background: white;
+      font-size: 14px;
+    }
+
+    .card {
+      background: white;
+      padding: 24px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 200px;
+      padding: 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: monospace;
+      resize: vertical;
+      outline: none;
+    }
+
+    textarea:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+    }
+
+    .hint {
+      margin-top: 8px;
+      color: #9ca3af;
+      font-size: 12px;
+    }
+
+    .options {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    .options label {
+      margin: 0;
+    }
+
+    button {
+      border: none;
+      border-radius: 6px;
+      padding: 10px 16px;
+      background: #2563eb;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    button.success {
+      background: #059669;
+    }
+
+    button.success:hover {
+      background: #047857;
+    }
+
+    button.copy {
+      background: #374151;
+      min-width: 80px;
+      margin: 0;
+    }
+
+    button.copy:hover {
+      background: #1f2937;
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+
+    .counter {
+      color: #6b7280;
+      font-size: 14px;
+      margin-left: 5px;
+    }
+
+    .result {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .branch {
+      flex: 1;
+      padding: 12px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 14px;
+      word-break: break-all;
+    }
+
+    .branch.pending {
+      color: #9ca3af;
+      font-style: italic;
+    }
+
+    .error {
+      color: #dc2626;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    .empty {
+      color: #9ca3af;
+      text-align: center;
+      padding: 30px;
+    }
+
+    .preview-title {
+      font-size: 12px;
+      color: #6b7280;
+      margin-bottom: 5px;
+    }
+
+    @media (max-width: 600px) {
+
+      .top-bar {
+        flex-direction: column;
+      }
+
+      .result {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      button.copy {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <!-- HEADER -->
+
+    <div class="top-bar">
+
+      <div>
+        <h1 id="title"></h1>
+        <p id="description" class="description"></p>
+      </div>
+
+      <div class="language">
+
+        <label
+          for="language"
+          id="languageLabel"
+          style="margin: 0;"
+        ></label>
+
+        <select id="language">
+          <option value="en">🇺🇸 English</option>
+          <option value="pt">🇧🇷 Português</option>
+          <option value="es">🇪🇸 Español</option>
+          <option value="de">🇩🇪 Deutsch</option>
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <!-- INPUT -->
+
+    <div class="card">
+
+      <label
+        for="tickets"
+        id="ticketsLabel"
+      ></label>
+
+      <textarea
+        id="tickets"
+      ></textarea>
+
+      <div
+        class="hint"
+        id="hint"
+      ></div>
+
+
+      <div class="options">
+
+        <label
+          for="bugPrefix"
+          id="bugPrefixLabel"
+        ></label>
+
+        <select id="bugPrefix">
+
+          <option value="fix">
+            fix/
+          </option>
+
+          <option value="bug">
+            bug/
+          </option>
+
+          <option value="hotfix">
+            hotfix/
+          </option>
+
+        </select>
+
+
+        <button
+          onclick="generateBranches()"
+          id="generateButton"
+        ></button>
+
+      </div>
+
+      <div
+        id="error"
+        class="error"
+      ></div>
+
+    </div>
+
+
+    <!-- RESULTS -->
+
+    <div class="card">
+
+      <div class="results-header">
+
+        <div>
+
+          <strong id="resultsTitle"></strong>
+
+          <span
+            id="counter"
+            class="counter"
+          ></span>
+
+        </div>
+
+
+        <button
+          id="copyAllButton"
+          class="success"
+          onclick="copyAll()"
+          style="display: none;"
+        ></button>
+
+      </div>
+
+
+      <div id="results">
+
+        <div
+          class="empty"
+          id="emptyResults"
+        ></div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <script>
+
+    /*
+     * ==========================================
+     * TRANSLATIONS
+     * ==========================================
+     */
+
+    const translations = {
+
+      en: {
+        title: "Azure DevOps → Branch Name",
+        description:
+          "Paste Azure DevOps ticket titles and generate branch names automatically.",
+        language: "Language",
+        tickets: "Tickets",
+        hint:
+          "The branch name is generated automatically as you type.",
+        bugPrefix:
+          "Bug prefix:",
+        generate:
+          "Generate branches",
+        results:
+          "Generated branches",
+        copyAll:
+          "Copy all",
+        copied:
+          "Copied!",
+        copy:
+          "Copy",
+        empty:
+          "Start typing a ticket above.",
+        emptyError:
+          "Enter at least one ticket.",
+        countOne:
+          "branch",
+        countMany:
+          "branches",
+        pending:
+          "Waiting for ticket format...",
+        placeholder:
+`Feature 941: Prevent Negative Value on First Transaction Item
+Bug 940: Transaction-Level Discount via Custom Action Applies Only to Selected Items
+Task 939: Update transaction validation
+User Story 938: Improve checkout experience`
+      },
+
+
+      pt: {
+        title: "Azure DevOps → Nome da Branch",
+        description:
+          "Cole os títulos dos tickets do Azure DevOps e gere os nomes das branches automaticamente.",
+        language: "Idioma",
+        tickets: "Tickets",
+        hint:
+          "O nome da branch é gerado automaticamente enquanto você digita.",
+        bugPrefix:
+          "Prefixo para Bug:",
+        generate:
+          "Gerar branches",
+        results:
+          "Branches geradas",
+        copyAll:
+          "Copiar todos",
+        copied:
+          "Copiado!",
+        copy:
+          "Copiar",
+        empty:
+          "Comece a digitar um ticket acima.",
+        emptyError:
+          "Digite pelo menos um ticket.",
+        countOne:
+          "branch",
+        countMany:
+          "branches",
+        pending:
+          "Aguardando o formato do ticket...",
+        placeholder:
+`Funcionalidade 941: Impedir valor negativo no primeiro item da transação
+Bug 940: Desconto no nível da transação
+Tarefa 939: Atualizar validação da transação
+História de Usuário 938: Melhorar experiência de checkout`
+      },
+
+
+      es: {
+        title: "Azure DevOps → Nombre de Branch",
+        description:
+          "Pegue los títulos de los tickets de Azure DevOps y genere automáticamente los nombres de las branches.",
+        language: "Idioma",
+        tickets: "Tickets",
+        hint:
+          "El nombre de la branch se genera automáticamente mientras escribe.",
+        bugPrefix:
+          "Prefijo para Bug:",
+        generate:
+          "Generar branches",
+        results:
+          "Branches generadas",
+        copyAll:
+          "Copiar todas",
+        copied:
+          "¡Copiado!",
+        copy:
+          "Copiar",
+        empty:
+          "Comience a escribir un ticket arriba.",
+        emptyError:
+          "Ingrese al menos un ticket.",
+        countOne:
+          "branch",
+        countMany:
+          "branches",
+        pending:
+          "Esperando el formato del ticket...",
+        placeholder:
+`Funcionalidad 941: Evitar valor negativo en el primer elemento de la transacción
+Error 940: Descuento a nivel de transacción
+Tarea 939: Actualizar validación de la transacción
+Historia de Usuario 938: Mejorar experiencia de checkout`
+      },
+
+
+      de: {
+        title: "Azure DevOps → Branch-Name",
+        description:
+          "Fügen Sie Azure-DevOps-Ticket-Titel ein und erstellen Sie automatisch Branch-Namen.",
+        language: "Sprache",
+        tickets: "Tickets",
+        hint:
+          "Der Branch-Name wird automatisch während der Eingabe generiert.",
+        bugPrefix:
+          "Bug-Präfix:",
+        generate:
+          "Branches generieren",
+        results:
+          "Generierte Branches",
+        copyAll:
+          "Alle kopieren",
+        copied:
+          "Kopiert!",
+        copy:
+          "Kopieren",
+        empty:
+          "Beginnen Sie oben mit der Eingabe eines Tickets.",
+        emptyError:
+          "Geben Sie mindestens ein Ticket ein.",
+        countOne:
+          "Branch",
+        countMany:
+          "Branches",
+        pending:
+          "Warte auf das Ticket-Format...",
+        placeholder:
+`Feature 941: Negativen Wert beim ersten Transaktionsartikel verhindern
+Fehler 940: Transaktionsrabatt über benutzerdefinierte Aktion
+Aufgabe 939: Transaktionsvalidierung aktualisieren
+Benutzergeschichte 938: Checkout-Erfahrung verbessern`
+      }
+
+    };
+
+
+    /*
+     * ==========================================
+     * TICKET TYPES
+     * ==========================================
+     */
+
+    const ticketTypes = {
+
+      feature: [
+        "feature",
+        "funcionalidade",
+        "funcionalidad"
+      ],
+
+      bug: [
+        "bug",
+        "error",
+        "fehler"
+      ],
+
+      task: [
+        "task",
+        "tarefa",
+        "tarea",
+        "aufgabe"
+      ],
+
+      userStory: [
+        "user story",
+        "história de usuário",
+        "historia de usuario",
+        "benutzergeschichte"
+      ]
+
+    };
+
+
+    /*
+     * ==========================================
+     * STATE
+     * ==========================================
+     */
+
+    let currentLanguage = "en";
+
+    let generatedBranches = [];
+
+
+    /*
+     * ==========================================
+     * DOM
+     * ==========================================
+     */
+
+    const languageSelect =
+      document.getElementById("language");
+
+    const ticketsInput =
+      document.getElementById("tickets");
+
+
+    /*
+     * ==========================================
+     * LANGUAGE CHANGE
+     * ==========================================
+     */
+
+    languageSelect.addEventListener(
+      "change",
+      function() {
+
+        currentLanguage = this.value;
+
+        updateInterface();
+
+        /*
+         * Regenera os resultados para atualizar
+         * os textos de estado/cópia.
+         */
+        generateBranches();
+
+      }
+    );
+
+
+    /*
+     * ==========================================
+     * REAL-TIME GENERATION
+     * ==========================================
+     *
+     * A branch é atualizada a cada alteração
+     * no textarea.
+     */
+
+    ticketsInput.addEventListener(
+      "input",
+      function() {
+
+        generateBranches();
+
+      }
+    );
+
+
+    /*
+     * ==========================================
+     * UPDATE INTERFACE
+     * ==========================================
+     */
+
+    function updateInterface() {
+
+      const t =
+        translations[currentLanguage];
+
+
+      document.documentElement.lang =
+        currentLanguage;
+
+
+      document.getElementById(
+        "title"
+      ).textContent =
+        t.title;
+
+
+      document.getElementById(
+        "description"
+      ).textContent =
+        t.description;
+
+
+      document.getElementById(
+        "languageLabel"
+      ).textContent =
+        t.language;
+
+
+      document.getElementById(
+        "ticketsLabel"
+      ).textContent =
+        t.tickets;
+
+
+      document.getElementById(
+        "hint"
+      ).textContent =
+        t.hint;
+
+
+      document.getElementById(
+        "bugPrefixLabel"
+      ).textContent =
+        t.bugPrefix;
+
+
+      document.getElementById(
+        "generateButton"
+      ).textContent =
+        t.generate;
+
+
+      document.getElementById(
+        "resultsTitle"
+      ).textContent =
+        t.results;
+
+
+      document.getElementById(
+        "copyAllButton"
+      ).textContent =
+        t.copyAll;
+
+
+      document.getElementById(
+        "tickets"
+      ).placeholder =
+        t.placeholder;
+
+    }
+
+
+    /*
+     * ==========================================
+     * GENERATE BRANCHES
+     * ==========================================
+     */
+
+    function generateBranches() {
+
+      const input =
+        ticketsInput.value;
+
+      const results =
+        document.getElementById(
+          "results"
+        );
+
+      const error =
+        document.getElementById(
+          "error"
+        );
+
+      const counter =
+        document.getElementById(
+          "counter"
+        );
+
+      const copyAllButton =
+        document.getElementById(
+          "copyAllButton"
+        );
+
+      const t =
+        translations[currentLanguage];
+
+
+      results.innerHTML = "";
+
+      error.textContent = "";
+
+      generatedBranches = [];
+
+
+      const tickets =
+        input
+          .split("\n")
+          .map(line => line.trim());
+
+
+      /*
+       * Remove linhas completamente vazias.
+       */
+
+      const validTickets =
+        tickets.filter(Boolean);
+
+
+      if (validTickets.length === 0) {
+
+        results.innerHTML = `
+          <div class="empty">
+            ${t.empty}
+          </div>
+        `;
+
+        counter.textContent = "";
+
+        copyAllButton.style.display =
+          "none";
+
+        return;
+
+      }
+
+
+      /*
+       * Gera as branches.
+       */
+
+      generatedBranches =
+        validTickets.map(ticket => {
+
+          return ticketToBranch(ticket);
+
+        });
+
+
+      /*
+       * Counter.
+       */
+
+      counter.textContent =
+        `(${generatedBranches.length} ${
+          generatedBranches.length === 1
+            ? t.countOne
+            : t.countMany
+        })`;
+
+
+      copyAllButton.style.display =
+        "block";
+
+
+      /*
+       * Render.
+       */
+
+      validTickets.forEach(
+        (ticket, index) => {
+
+          const branch =
+            generatedBranches[index];
+
+
+          const result =
+            document.createElement(
+              "div"
+            );
+
+          result.className =
+            "result";
+
+
+          const branchElement =
+            document.createElement(
+              "div"
+            );
+
+          branchElement.className =
+            "branch";
+
+
+          /*
+           * Se o ticket ainda não está
+           * completo, mostra um preview.
+           */
+
+          if (!isCompleteTicket(ticket)) {
+
+            branchElement.classList.add(
+              "pending"
+            );
+
+          }
+
+
+          branchElement.textContent =
+            branch;
+
+
+          const copyButton =
+            document.createElement(
+              "button"
+            );
+
+          copyButton.className =
+            "copy";
+
+          copyButton.textContent =
+            t.copy;
+
+
+          copyButton.onclick =
+            async () => {
+
+              await copyText(
+                branch
+              );
+
+
+              copyButton.textContent =
+                translations[
+                  currentLanguage
+                ].copied;
+
+
+              setTimeout(() => {
+
+                copyButton.textContent =
+                  translations[
+                    currentLanguage
+                  ].copy;
+
+              }, 1500);
+
+            };
+
+
+          result.appendChild(
+            branchElement
+          );
+
+          result.appendChild(
+            copyButton
+          );
+
+
+          results.appendChild(
+            result
+          );
+
+        }
+      );
+
+    }
+
+
+    /*
+     * ==========================================
+     * TICKET → BRANCH
+     * ==========================================
+     */
+
+    function ticketToBranch(ticket) {
+
+      const match =
+        ticket.match(
+          /^(.+?)\s+(\d+)\s*:\s*(.*)$/
+        );
+
+
+      /*
+       * Enquanto o usuário está digitando
+       * o ID, ainda podemos gerar um preview.
+       */
+
+      if (!match) {
+
+        return previewBranch(ticket);
+
+      }
+
+
+      const rawType =
+        match[1]
+          .trim()
+          .toLowerCase();
+
+
+      const id =
+        match[2];
+
+
+      const description =
+        match[3];
+
+
+      const type =
+        normalizeTicketType(
+          rawType
+        );
+
+
+      const branchType =
+        getBranchType(type);
+
+
+      /*
+       * Se ainda não existe descrição,
+       * mostra apenas o prefixo + ID.
+       */
+
+      if (!description.trim()) {
+
+        return `${branchType}/${id}`;
+
+      }
+
+
+      return (
+        `${branchType}/` +
+        `${id}-` +
+        `${slugify(description)}`
+      );
+
+    }
+
+
+    /*
+     * ==========================================
+     * PREVIEW
+     * ==========================================
+     *
+     * Permite mostrar alguma coisa enquanto
+     * o usuário ainda está digitando.
+     */
+
+    function previewBranch(ticket) {
+
+      const normalized =
+        ticket.toLowerCase();
+
+
+      let branchType =
+        "feature";
+
+
+      if (
+        normalized.startsWith("bug") ||
+        normalized.startsWith("error") ||
+        normalized.startsWith("fehler")
+      ) {
+
+        branchType =
+          document.getElementById(
+            "bugPrefix"
+          ).value;
+
+      }
+
+
+      /*
+       * Tenta encontrar o ID.
+       */
+
+      const idMatch =
+        ticket.match(/\b(\d+)\b/);
+
+
+      if (idMatch) {
+
+        const id =
+          idMatch[1];
+
+
+        const afterId =
+          ticket
+            .substring(
+              idMatch.index +
+              id.length
+            )
+            .replace(
+              /^\s*:\s*/,
+              ""
+            )
+            .trim();
+
+
+        if (afterId) {
+
+          return (
+            `${branchType}/` +
+            `${id}-` +
+            `${slugify(afterId)}`
+          );
+
+        }
+
+
+        return (
+          `${branchType}/${id}`
+        );
+
+      }
+
+
+      /*
+       * Ainda não encontrou ID.
+       */
+
+      if (!ticket.trim()) {
+
+        return translations[
+          currentLanguage
+        ].empty;
+
+      }
+
+
+      return (
+        `${branchType}/` +
+        slugify(ticket)
+      );
+
+    }
+
+
+    /*
+     * ==========================================
+     * COMPLETE TICKET?
+     * ==========================================
+     */
+
+    function isCompleteTicket(ticket) {
+
+      return /^(.+?)\s+\d+\s*:\s*.+$/i
+        .test(ticket);
+
+    }
+
+
+    /*
+     * ==========================================
+     * NORMALIZE TYPE
+     * ==========================================
+     */
+
+    function normalizeTicketType(type) {
+
+      for (
+        const [
+          normalizedType,
+          aliases
+        ] of Object.entries(
+          ticketTypes
+        )
+      ) {
+
+        if (
+          aliases.includes(type)
+        ) {
+
+          return normalizedType;
+
+        }
+
+      }
+
+
+      return "feature";
+
+    }
+
+
+    /*
+     * ==========================================
+     * BRANCH TYPE
+     * ==========================================
+     */
+
+    function getBranchType(type) {
+
+      switch (type) {
+
+        case "feature":
+
+          return "feature";
+
+
+        case "bug":
+
+          return document
+            .getElementById(
+              "bugPrefix"
+            )
+            .value;
+
+
+        case "task":
+
+          return "chore";
+
+
+        case "userStory":
+
+          return "feature";
+
+
+        default:
+
+          return "feature";
+
+      }
+
+    }
+
+
+    /*
+     * ==========================================
+     * SLUGIFY
+     * ==========================================
+     */
+
+    function slugify(text) {
+
+      return text
+
+        .normalize("NFD")
+
+        .replace(
+          /[\u0300-\u036f]/g,
+          ""
+        )
+
+        .toLowerCase()
+
+        .replace(
+          /[^a-z0-9]+/g,
+          "-"
+        )
+
+        .replace(
+          /-+/g,
+          "-"
+        )
+
+        .replace(
+          /^-+|-+$/g,
+          "");
+
+    }
+
+
+    /*
+     * ==========================================
+     * COPY
+     * ==========================================
+     */
+
+    async function copyText(text) {
+
+      try {
+
+        await navigator.clipboard
+          .writeText(text);
+
+      } catch (error) {
+
+        const textarea =
+          document.createElement(
+            "textarea"
+          );
+
+        textarea.value =
+          text;
+
+        document.body.appendChild(
+          textarea
+        );
+
+        textarea.select();
+
+        document.execCommand(
+          "copy"
+        );
+
+        textarea.remove();
+
+      }
+
+    }
+
+
+    /*
+     * ==========================================
+     * COPY ALL
+     * ==========================================
+     */
+
+    async function copyAll() {
+
+      if (
+        generatedBranches.length === 0
+      ) {
+
+        return;
+
+      }
+
+
+      const text =
+        generatedBranches.join("\n");
+
+
+      await copyText(text);
+
+
+      const button =
+        document.getElementById(
+          "copyAllButton"
+        );
+
+
+      const t =
+        translations[
+          currentLanguage
+        ];
+
+
+      button.textContent =
+        t.copied;
+
+
+      setTimeout(() => {
+
+        button.textContent =
+          translations[
+            currentLanguage
+          ].copyAll;
+
+      }, 1500);
+
+    }
+
+
+    /*
+     * ==========================================
+     * BUG PREFIX CHANGE
+     * ==========================================
+     */
+
+    document
+      .getElementById("bugPrefix")
+      .addEventListener(
+        "change",
+        generateBranches
+      );
+
+
+    /*
+     * ==========================================
+     * INITIALIZE
+     * ==========================================
+     */
+
+    updateInterface();
+
+    generateBranches();
+
+  </script>
+
+</body>
+</html>
